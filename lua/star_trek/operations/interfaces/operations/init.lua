@@ -119,6 +119,7 @@ function SELF:Open(ent)
 
 	local tractorBeamRow = scannerWindow:CreateMainButtonRow(32)
 	scannerWindow:AddButtonToRow(tractorBeamRow, "Enable Tractor Beam", nil, nil, nil, false, true, function(ply, buttonData)
+		Star_Trek.Util.PermaMemory:SetValue("tractor_beam_enabled", buttonData.Selected)
 		if buttonData.Selected then
 			buttonData.Name = "Disable Tractor Beam"
 
@@ -139,6 +140,15 @@ function SELF:Open(ent)
 			hook.Run("Star_Trek.Operations.TractorBeamDisabled", ply)
 		end
 	end)
+	local tractorBeamEnabled = Star_Trek.Util.PermaMemory:GetValue("tractor_beam_enabled", false)
+	if tractorBeamEnabled then
+		tractorBeamRow.Buttons[1].Selected = true
+		tractorBeamRow.Buttons[1].Name = "Disable Tractor Beam"
+
+		if not isnumber(tractorBeamRow.LoopId) then
+			tractorBeamRow.LoopId = ent:StartLoopingSound("star_trek.world.voy_tractor_loop")
+		end
+	end
 
 	local commsSelectionWindowPos = Vector(25.9, -1, 3.5)
 	local commsSelectionWindowAng = Angle(0, 0, 11)
@@ -154,6 +164,7 @@ function SELF:Open(ent)
 
 	local hailTargetRow = commsWindow:CreateSecondaryButtonRow(32)
 	self.HailTargetButton = commsWindow:AddButtonToRow(hailTargetRow, "Hail Target", nil, nil, nil, false, true, function(ply, buttonData)
+		Star_Trek.Util.PermaMemory:SetValue("comms_active", buttonData.Selected)
 		if buttonData.Selected then
 			buttonData.Name = "Close Channel"
 			self.HailRespondButton.Name = "Mute Channel"
@@ -163,6 +174,8 @@ function SELF:Open(ent)
 			ent:EmitSound("star_trek.world.comms_open")
 
 			hook.Run("Star_Trek.Operations.CommsOpen", ply)
+
+			Star_Trek.Util.PermaMemory:SetValue("channel_muted", false)
 
 			return true
 		else
@@ -182,6 +195,7 @@ function SELF:Open(ent)
 	local repondHailRow = commsWindow:CreateSecondaryButtonRow(32)
 	self.HailRespondButton = commsWindow:AddButtonToRow(repondHailRow, "Respond to Hail", nil, nil, Star_Trek.LCARS.ColorRed, false, true, function(ply, buttonData)
 		if self.HailTargetButton.Selected then
+			Star_Trek.Util.PermaMemory:SetValue("channel_muted", buttonData.Selected)
 			if buttonData.Selected then
 				buttonData.Name = "Resume Channel"
 
@@ -207,6 +221,8 @@ function SELF:Open(ent)
 			buttonData.Selected = false
 			buttonData.Name = "Mute Channel"
 
+			Star_Trek.Util.PermaMemory:SetValue("comms_active", true)
+
 			self.HailTargetButton.Selected = true
 			self.HailTargetButton.Name = "Close Channel"
 
@@ -219,6 +235,17 @@ function SELF:Open(ent)
 			return true
 		end
 	end)
+	local commsActive = Star_Trek.Util.PermaMemory:GetValue("comms_active", false)
+	if commsActive then
+		self.HailTargetButton.Selected = true
+		self.HailTargetButton.Name = "Close Channel"
+		self.HailRespondButton.Name = "Mute Channel"
+		local channelMuted = Star_Trek.Util.PermaMemory:GetValue("channel_muted", false)
+		if channelMuted then
+			self.HailRespondButton.Selected = true
+			self.HailRespondButton.Name = "Resume Channel"
+		end
+	end
 
 	return true, windows, offsetPos, offsetAngle
 end
