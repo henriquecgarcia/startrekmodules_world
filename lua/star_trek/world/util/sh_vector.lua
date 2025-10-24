@@ -92,6 +92,10 @@ local function __sub(a, b)
 		)
 	end
 
+	if not IsWorldVector(a) then
+		error("Substracting World Vectors: world vector expected got " .. type(a))
+	end
+
 	if IsWorldVector(b) then
 		return WorldVector(
 			a[1] - b[1],
@@ -163,9 +167,17 @@ local function __eq(a, b)
 		end
 
 		return false
+	elseif type(b) == type(a) then
+		for key, value in pairs(a) do
+			if value ~= b[key] then
+				return false
+			end
+		end
+
+		return true
 	end
 
-	error("Comparing World Vectors: world vector expected got" .. type(b))
+	error("Comparing World Vectors: world vector expected got " .. type(b))
 end
 
 -- Converts the vector into a string, to be output.
