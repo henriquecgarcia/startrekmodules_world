@@ -228,15 +228,18 @@ function SELF:SelectNavigationHierachyMode()
 
 	local lockCourse = navigationWindow:CreateMainButtonRow(32)
 	navigationWindow.LockCourseButton = navigationWindow:AddButtonToRow(lockCourse, "Lock Course", nil, Star_Trek.LCARS.ColorOrange, nil, false, true, function(ply, buttonData)
+
 		local ship = Star_Trek.World:GetEntity(1)
 		if not istable(ship) then
 			self.Ent:EmitSound("star_trek.lcars_error")
+			print("Ship not found")
 
 			return true
 		end
 
 		if istable(ship.ActiveManeuver) then
 			self.Ent:EmitSound("star_trek.lcars_error")
+			print("Ship already maneuvering")
 
 			return true
 		end
@@ -244,6 +247,7 @@ function SELF:SelectNavigationHierachyMode()
 		local navigationUtilWindow = self.NavigationUtilWindow
 		if not istable(navigationUtilWindow) then
 			self.Ent:EmitSound("star_trek.lcars_error")
+			print("Navigation Util Window not found")
 
 			return true
 		end
@@ -251,6 +255,7 @@ function SELF:SelectNavigationHierachyMode()
 		local selectedListButton = navigationUtilWindow.SelectedListButton
 		if not istable(selectedListButton) then
 			self.Ent:EmitSound("star_trek.lcars_error")
+			print("No target selected")
 
 			return true
 		end
@@ -275,6 +280,7 @@ function SELF:SelectNavigationHierachyMode()
 				targetPos = planet.Pos
 			else
 				self.Ent:EmitSound("star_trek.lcars_error")
+				print("Planet not found")
 
 				return true
 			end

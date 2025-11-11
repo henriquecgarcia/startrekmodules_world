@@ -265,6 +265,13 @@ function Star_Trek.World:PlotCourse(shipId, startPos, endPos, depth)
 	if not shipId or not startPos or not endPos then
 		return false, "Invalid Arguments"
 	end
+	
+	-- Verify ship exists
+	local ship = self.Entities[shipId]
+	if not istable(ship) then
+		return false, "Ship not found in entity registry"
+	end
+	
 	depth = depth or MAX_DEPTH
 	
 	if depth == 0 then
@@ -287,21 +294,36 @@ function Star_Trek.World:PlotCourse(shipId, startPos, endPos, depth)
 	-- Calculate bypass points
 	local bypassPoint1, bypassPoint2 = calculateBypassPoints(startPos, endPos, closestCollision)
 	
-	-- Validate bypass points don't go backwards
-	local directDistance = startPos:Distance(endPos)
-	if bypassPoint1:Distance(endPos) >= directDistance and bypassPoint2:Distance(endPos) >= directDistance then
-		return false, "No viable path found - all bypass routes go backwards"
+	-- Check if we're making forward progress
+	-- A bypass is valid if it gets us closer to the destination than staying at the collision point
+	local collisionDistToEnd = closestCollision.approachPos:Distance(endPos)
+	local bypass1Valid = bypassPoint1:Distance(endPos) < collisionDistToEnd
+	local bypass2Valid = bypassPoint2:Distance(endPos) < collisionDistToEnd
+	
+	-- If neither bypass makes progress, try a larger orbit radius
+	if not bypass1Valid and not bypass2Valid then
+		-- Increase orbit distance and recalculate
+		local enlargedCollision = table.Copy(closestCollision)
+		enlargedCollision.orbitDistance = orbitDistance * 2.0
+		bypassPoint1, bypassPoint2 = calculateBypassPoints(startPos, endPos, enlargedCollision)
+		bypass1Valid = bypassPoint1:Distance(endPos) < collisionDistToEnd * 1.5
+		bypass2Valid = bypassPoint2:Distance(endPos) < collisionDistToEnd * 1.5
+	end
+	
+	-- If still no valid path, return error
+	if not bypass1Valid and not bypass2Valid then
+		return false, "No viable path found - obstacle blocks all routes"
 	end
 	
 	local bestPath = nil
 	local shortestDistance = math.huge
 	
-	-- Try both bypass routes
-	for _, bypassPoint in ipairs({bypassPoint1, bypassPoint2}) do
-		-- Skip if this route goes backwards
-		if bypassPoint:Distance(endPos) >= directDistance then
-			continue
-		end
+	-- Try both bypass routes (only valid ones)
+	local bypassPoints = {}
+	if bypass1Valid then table.insert(bypassPoints, bypassPoint1) end
+	if bypass2Valid then table.insert(bypassPoints, bypassPoint2) end
+	
+	for _, bypassPoint in ipairs(bypassPoints) do
 		
 		-- Recursively plot course through bypass point
 		local success1, path1 = self:PlotCourse(shipId, startPos, bypassPoint, depth - 1)

@@ -81,13 +81,42 @@ function SELF:Open(ent)
 	local mapScreenW = 680
 	local mapScreenH = 400
 
-	local success5, mapWindow = Star_Trek.LCARS:CreateWindow("text_entry", mapScreenPos, mapScreenAng, scale, mapScreenW, mapScreenH,
+	local success5, mapWindow = Star_Trek.LCARS:CreateWindow("button_matrix", mapScreenPos, mapScreenAng, scale, mapScreenW, mapScreenH,
 	function(windowData, interfaceData, ply, categoryId, buttonId)
 		-- No Additional Interactivity here.
-	end, nil, "Map", nil, WINDOW_BORDER_BOTH, {})
+	end, "Ship Control", "ALERT", false)
 	if not success5 then
 		return false, mapWindow
 	end
+
+	local sRow1 = mapWindow:CreateSecondaryButtonRow(32)
+	mapWindow:AddButtonToRow(sRow1, "Red Alert", nil, Star_Trek.LCARS.ColorRed, nil, false, false, function(ply)
+		Star_Trek.Alert:Enable("red")
+
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "")
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "RED ALERT!")
+	end)
+	local sRow2 = mapWindow:CreateSecondaryButtonRow(32)
+	mapWindow:AddButtonToRow(sRow2, "Yellow Alert", nil, Star_Trek.LCARS.ColorOrange, nil, false, false, function(ply)
+		Star_Trek.Alert:Enable("yellow")
+
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "")
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "YELLOW ALERT!")
+	end)
+	local sRow3 = mapWindow:CreateSecondaryButtonRow(32)
+	mapWindow:AddButtonToRow(sRow3, "Blue Alert", nil, Star_Trek.LCARS.ColorLightBlue, nil, false, false, function(ply)
+		Star_Trek.Alert:Enable("blue")
+
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "")
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "BLUE ALERT!")
+	end)
+	local sRow4 = mapWindow:CreateSecondaryButtonRow(32)
+	mapWindow:AddButtonToRow(sRow4, "Disable Alert", nil, Star_Trek.LCARS.ColorWhite, nil, false, false, function(ply)
+		Star_Trek.Alert:Disable()
+
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "")
+		Star_Trek.Logs:AddEntry(self.Ent, ply, "Alert Disabled!")
+	end)
 
 	local mapControlPos = Vector(viewScreenPos)
 	local mapControlAng = Angle(viewScreenAng)

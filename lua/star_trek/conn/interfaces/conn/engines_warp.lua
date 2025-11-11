@@ -97,7 +97,14 @@ function SELF:SelectEngineModeWarp()
 		local ship = Star_Trek.World:GetEntity(1)
 		if not istable(ship) then
 			self.Ent:EmitSound("star_trek.lcars_error")
-			print("Ship not found")
+			print("Ship not found - Galaxy may still be loading")
+
+			return true
+		end
+		
+		if not ship.Pos then
+			self.Ent:EmitSound("star_trek.lcars_error")
+			print("Ship position not initialized")
 
 			return true
 		end
@@ -146,7 +153,29 @@ function SELF:SetEngineTargetWarp()
 	end
 
 	local ship = Star_Trek.World:GetEntity(1)
-	if not istable(ship) then return end
+	if not istable(ship) then 
+		-- Ship not loaded yet, set button to disabled state
+		engineControlWindow.WarpDistanceButton.Disabled = true
+		engineControlWindow.WarpDistanceButton.Name = "---"
+		engineControlWindow.WarpDurationButton.Disabled = true
+		engineControlWindow.WarpDurationButton.Name = "---"
+		engineControlWindow.EngageWarpButton.Disabled = true
+		engineControlWindow.EngageWarpButton.Name = "Waiting for Ship..."
+		engineControlWindow:Update()
+		return 
+	end
+	
+	if not ship.Pos then
+		-- Ship position not initialized yet
+		engineControlWindow.WarpDistanceButton.Disabled = true
+		engineControlWindow.WarpDistanceButton.Name = "---"
+		engineControlWindow.WarpDurationButton.Disabled = true
+		engineControlWindow.WarpDurationButton.Name = "---"
+		engineControlWindow.EngageWarpButton.Disabled = true
+		engineControlWindow.EngageWarpButton.Name = "Ship Initializing..."
+		engineControlWindow:Update()
+		return
+	end
 
 	self.EngineWarpCourse = ship:PlotCourse(targetPos)
 	if not istable(self.EngineWarpCourse) then return end

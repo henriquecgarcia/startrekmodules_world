@@ -165,10 +165,22 @@ function SELF:ExecuteCourse(course, targetSpeed, callback)
 end
 
 function SELF:PlotCourse(targetPos)
+	if not self.Id then
+		print("ERROR: Ship ID not set")
+		return nil
+	end
+	
+	if not self.Pos then
+		print("ERROR: Ship position not set")
+		return nil
+	end
+	
 	local success, course = Star_Trek.World:PlotCourse(self.Id, self.Pos, targetPos)
-	print(success, course)
+	if not success then
+		print("ERROR: PlotCourse failed - ", course)
+		return nil
+	end
 
-	-- TODO: Error Handling
 	return course
 end
 
