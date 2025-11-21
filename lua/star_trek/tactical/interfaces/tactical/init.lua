@@ -48,7 +48,7 @@ function SELF:Open(ent)
 			ent:EmitSound("star_trek.world.power_up")
 
 			hook.Run("Star_Trek.Tactical.ShieldsUp", ply)
-			Star_Trek.Util.PermaMemory:SetValue("ship_shields_up", true)
+			Star_Trek.Util.ShipState:SetValue("ship_shields_up", true)
 
 			return true
 		else
@@ -59,12 +59,12 @@ function SELF:Open(ent)
 			ent:EmitSound("star_trek.world.power_down")
 
 			hook.Run("Star_Trek.Tactical.ShieldsDown", ply)
-			Star_Trek.Util.PermaMemory:SetValue("ship_shields_up", false)
+			Star_Trek.Util.ShipState:SetValue("ship_shields_up", false)
 
 			return true
 		end
 	end)
-	local shieldStatus = Star_Trek.Util.PermaMemory:GetValue("ship_shields_up", false)
+	local shieldStatus = Star_Trek.Util.ShipState:GetValue("ship_shields_up", false)
 	if shieldStatus then
 		shieldChargeRow.Buttons[1].Selected = true
 		shieldChargeRow.Buttons[1].Name = "Lower Shields"
@@ -80,11 +80,11 @@ function SELF:Open(ent)
 	}, 3, function(ply, buttonData, valueData)
 		Star_Trek.Logs:AddEntry(ent, ply, "Shield frequency set: " .. valueData.Name)
 
-		Star_Trek.Util.PermaMemory:SetValue("ship_shield_frequency", valueData.Data)
+		Star_Trek.Util.ShipState:SetValue("ship_shield_frequency", valueData.Data)
 
 		hook.Run("Star_Trek.Tactical.ShieldFrequencyChanged", ply, valueData.Name)
 	end)
-	local shieldFrequency = Star_Trek.Util.PermaMemory:GetValue("ship_shield_frequency", 3)
+	local shieldFrequency = Star_Trek.Util.ShipState:GetValue("ship_shield_frequency", 3)
 	shieldFreqRow:SetValue(shieldFrequency)
 
 	local weaponSelectionWindowPos = Vector(-25.9, -1, 3.5)
@@ -102,7 +102,7 @@ function SELF:Open(ent)
 	-- Phaser Control
 	local phaserChargeRow = weaponWindow:CreateSecondaryButtonRow(32)
 	weaponWindow:AddButtonToRow(phaserChargeRow, "Power Phasers", nil, Star_Trek.LCARS.ColorOrange, Star_Trek.LCARS.ColorRed, false, true, function(ply, buttonData)
-		Star_Trek.Util.PermaMemory:SetValue("ship_phasers_powered", buttonData.Selected)
+		Star_Trek.Util.ShipState:SetValue("ship_phasers_powered", buttonData.Selected)
 		if buttonData.Selected then
 			buttonData.Name = "Lower Phasers"
 
@@ -134,7 +134,7 @@ function SELF:Open(ent)
 	}, 3, function(ply, buttonData, valueData)
 		Star_Trek.Logs:AddEntry(ent, ply, "Phaser yield set: " .. valueData.Name)
 
-		Star_Trek.Util.PermaMemory:SetValue("ship_phaser_yield", valueData.Data)
+		Star_Trek.Util.ShipState:SetValue("ship_phaser_yield", valueData.Data)
 
 		hook.Run("Star_Trek.Tactical.PhaserYieldChanged", ply, valueData.Name)
 	end)
@@ -149,7 +149,7 @@ function SELF:Open(ent)
 	}, 3, function(ply, buttonData, valueData)
 		Star_Trek.Logs:AddEntry(ent, ply, "Phaser frequency set: " .. valueData.Name)
 
-		Star_Trek.Util.PermaMemory:SetValue("ship_phaser_frequency", valueData.Data)
+		Star_Trek.Util.ShipState:SetValue("ship_phaser_frequency", valueData.Data)
 
 		hook.Run("Star_Trek.Tactical.PhaserFrequencyChanged", ply, valueData.Name)
 	end)
@@ -173,7 +173,7 @@ function SELF:Open(ent)
 
 		return true
 	end)
-	local phaserPowered = Star_Trek.Util.PermaMemory:GetValue("ship_phasers_powered", false)
+	local phaserPowered = Star_Trek.Util.ShipState:GetValue("ship_phasers_powered", false)
 	if phaserPowered then
 		phaserChargeRow.Buttons[1].Selected = true
 		phaserChargeRow.Buttons[1].Name = "Lower Phasers"
@@ -184,16 +184,16 @@ function SELF:Open(ent)
 		self.FirePhaserBurst.Disabled = false
 	end
 	PrintTable(pasherPowerRow)
-	local phaserYield = Star_Trek.Util.PermaMemory:GetValue("ship_phaser_yield", 3)
+	local phaserYield = Star_Trek.Util.ShipState:GetValue("ship_phaser_yield", 3)
 	pasherPowerRow:SetValue(phaserYield)
 
-	local phaserFrequency = Star_Trek.Util.PermaMemory:GetValue("ship_phaser_frequency", 3)
+	local phaserFrequency = Star_Trek.Util.ShipState:GetValue("ship_phaser_frequency", 3)
 	phaserFreqRow:SetValue(phaserFrequency)
 
 	-- Torpedo Control
 	local torpedoChargeRow = weaponWindow:CreateMainButtonRow(32)
 	weaponWindow:AddButtonToRow(torpedoChargeRow, "Prime Torpedos", nil, Star_Trek.LCARS.ColorOrange, Star_Trek.LCARS.ColorRed, false, true, function(ply, buttonData)
-		Star_Trek.Util.PermaMemory:SetValue("ship_torpedos_primed", buttonData.Selected)
+		Star_Trek.Util.ShipState:SetValue("ship_torpedos_primed", buttonData.Selected)
 		if buttonData.Selected then
 			buttonData.Name = "Defuse Torpedos"
 
@@ -225,7 +225,7 @@ function SELF:Open(ent)
 	}, 3, function(ply, buttonData, valueData)
 		Star_Trek.Logs:AddEntry(ent, ply, "Topedo Yield Set: " .. valueData.Name)
 
-		Star_Trek.Util.PermaMemory:SetValue("ship_torpedo_yield", valueData.Data)
+		Star_Trek.Util.ShipState:SetValue("ship_torpedo_yield", valueData.Data)
 
 		hook.Run("Star_Trek.Tactical.TorpedoYieldChanged", ply, valueData.Name)
 	end)
@@ -238,7 +238,7 @@ function SELF:Open(ent)
 	}, 1, function(ply, buttonData, valueData)
 		Star_Trek.Logs:AddEntry(ent, ply, "Changing to " .. valueData.Name .. " torpedos.")
 
-		Star_Trek.Util.PermaMemory:SetValue("ship_torpedo_type", valueData.Data)
+		Star_Trek.Util.ShipState:SetValue("ship_torpedo_type", valueData.Data)
 
 		hook.Run("Star_Trek.Tactical.TorpedoTypeChanged", ply, valueData.Name)
 	end)
@@ -262,7 +262,7 @@ function SELF:Open(ent)
 
 		return true
 	end)
-	local torpedosPrimed = Star_Trek.Util.PermaMemory:GetValue("ship_torpedos_primed", false)
+	local torpedosPrimed = Star_Trek.Util.ShipState:GetValue("ship_torpedos_primed", false)
 	if torpedosPrimed then
 		torpedoChargeRow.Buttons[1].Selected = true
 		torpedoChargeRow.Buttons[1].Name = "Defuse Torpedos"
@@ -270,9 +270,9 @@ function SELF:Open(ent)
 		self.FireTorpedo.Disabled = false
 		self.FireTorpedoBurst.Disabled = false
 	end
-	local torpedoYield = Star_Trek.Util.PermaMemory:GetValue("ship_torpedo_yield", 3)
+	local torpedoYield = Star_Trek.Util.ShipState:GetValue("ship_torpedo_yield", 3)
 	torpedoPowerRow:SetValue(torpedoYield)
-	local torpedoType = Star_Trek.Util.PermaMemory:GetValue("ship_torpedo_type", 1)
+	local torpedoType = Star_Trek.Util.ShipState:GetValue("ship_torpedo_type", 1)
 	torpedoTypeRow:SetValue(torpedoType)
 
 	return true, windows, offsetPos, offsetAngle
