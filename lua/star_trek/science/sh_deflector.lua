@@ -77,6 +77,8 @@ function Deflector:Fire()
             self:Cease()
         end)
     end
+
+    hook.Run("StarTrek.Deflector.Fired", self, particle, activeDish, color)
 end
 
 
